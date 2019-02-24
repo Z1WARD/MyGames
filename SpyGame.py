@@ -13,39 +13,41 @@ stand = pygame.image.load('R1.png')
 
 clock = pygame.time.Clock()
 
-x = 40
-y = 500
-width = 64
-height = 64
-move = 7
 
-jumping = False
-jumpheight = 10
+class Player(object):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.move = 7
+        self.jumping = False
+        self.jumpHeight = 10
+        self.left = False
+        self.right = False
+        self.walkCount = 0
 
-left = False
-right = False
-walkcount = 0
+    def draw(self, window):
+        if self.walkCount + 1 > 8:
+            self.walkCount = 0
+
+        if spy.left:
+            window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
+            self.walkCount += 1
+        elif self.right:
+            window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
+            self.walkCount += 1
+        else:
+            window.blit(stand, (self.x, self.y))
 
 
-def updateGameWindow():
-    global walkcount
+def update_game_window():
     window.blit(bg, (0, 0))
-
-    if walkcount + 1 > 8:
-        walkcount = 0
-
-    if left:
-        window.blit(walkLeft[walkcount//2], (x, y))
-        walkcount += 1
-    elif right:
-        window.blit(walkRight[walkcount//2], (x, y))
-        walkcount += 1
-    else:
-        window.blit(stand, (x, y))
-
+    spy.draw(window)
     pygame.display.update()
 
 
+spy = Player(300, 410, 64, 64)
 run = True
 while run:
     clock.tick(34)
@@ -56,37 +58,37 @@ while run:
 
     buttom = pygame.key.get_pressed()
 
-    if buttom[pygame.K_LEFT] and x > move:
-        x -= move
-        left = True
-        right = False
+    if buttom[pygame.K_LEFT] and spy.x > spy.move:
+        spy.x -= spy.move
+        spy.left = True
+        spy.right = False
 
-    elif buttom[pygame.K_RIGHT] and x < 1150 - move - width:
-        x += move
-        left = False
-        right = True
+    elif buttom[pygame.K_RIGHT] and spy.x < 1150 - spy.move - spy.width:
+        spy.x += spy.move
+        spy.left = False
+        spy.right = True
     else:
-        right = False
-        left = False
-        walkcount = 0
+        spy.right = False
+        spy.left = False
+        spy.walkCount = 0
 
-    if not jumping:
+    if not spy.jumping:
         if buttom[pygame.K_SPACE]:
-            jumping = True
-            right = False
-            left = False
-            walkcount = 0
+            spy.jumping = True
+            spy.right = False
+            spy.left = False
+            spy.walkCount = 0
     else:
-        if jumpheight >= -10:
+        if spy.jumpHeight >= -10:
             neg = 1
-            if jumpheight < 0:
+            if spy.jumpHeight < 0:
                 neg = -1
-            y -= (jumpheight ** 2) / 2 * neg
-            jumpheight -= 1
+            spy.y -= (spy.jumpHeight ** 2) / 2 * neg
+            spy.jumpHeight -= 1
         else:
-            jumping = False
-            jumpheight = 10
+            spy.jumping = False
+            spy.jumpHeight = 10
 
-    updateGameWindow()
+    update_game_window()
 
 pygame.quit()
