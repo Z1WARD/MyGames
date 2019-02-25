@@ -31,21 +31,21 @@ class Player(object):
     def draw(self, window):
         if self.walkCount + 1 > 8:
             self.walkCount = 0
-        
-        if not(self.standing):
-          if self.left:
-              window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
-              self.walkCount += 1
-          elif self.right:
-              window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
-              self.walkCount += 1
-        else:
-          if self.right:
-            window.blit(walkRight[0], (self.x, self.y))
-          else:
-            window.blit(walkLeft[0], (self.x, self.y))
 
-            
+        if not(self.standing):
+            if self.left:
+                window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
+                self.walkCount += 1
+            elif self.right:
+                window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
+                self.walkCount += 1
+        else:
+            if self.right:
+                window.blit(walkRight[0], (self.x, self.y))
+            else:
+                window.blit(walkLeft[0], (self.x, self.y))
+
+
 class Weapon(object):
     def __init__(self, x, y, radius, color, direction):
         self.x = x
@@ -56,7 +56,7 @@ class Weapon(object):
         self.speed = 8 * direction
 
     def draw(self, window):
-        pygame.draw.circle(window, self.color, (self.x, self.y), self.radius)        
+        pygame.draw.circle(window, self.color, (self.x, self.y), self.radius)
 
 
 def update_game_window():
