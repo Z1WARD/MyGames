@@ -33,17 +33,18 @@ class Player(object):
             self.walkCount = 0
 
         if not(self.standing):
-            if self.left:
-                window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
-                self.walkCount += 1
-            elif self.right:
+            if self.right:
                 window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
                 self.walkCount += 1
+            elif self.left:
+                window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
+                self.walkCount += 1
+
         else:
-            if self.right:
-                window.blit(walkRight[0], (self.x, self.y))
-            else:
+            if self.left:
                 window.blit(walkLeft[0], (self.x, self.y))
+            else:
+                window.blit(walkRight[0], (self.x, self.y))
 
 
 class Weapon(object):
@@ -62,10 +63,15 @@ class Weapon(object):
 def update_game_window():
     window.blit(bg, (0, 0))
     spy.draw(window)
+
+    for bullet in bullets:
+        bullet.draw(window)
+
     pygame.display.update()
 
 
 spy = Player(300, 410, 64, 64)
+bullets = []
 run = True
 while run:
     clock.tick(34)
@@ -74,7 +80,24 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    for bullet in bullets:
+        if 15 < bullet.x < 1129:
+            bullet.x += bullet.speed
+        else:
+            bullets.pop(bullets.index(bullet))
+
     buttom = pygame.key.get_pressed()
+
+    if buttom[pygame.K_SPACE]:
+        if spy.right:
+            direction = 1
+        elif spy.left:
+            direction = -1
+        else:
+            direction = 1
+
+        if len(bullets) < 3:
+            bullets.append(Weapon(round(spy.x + spy.width), round(spy.y + spy.height // 0.73), 5, (0, 0, 0), direction))
 
     if buttom[pygame.K_LEFT] and spy.x > spy.move:
         spy.x -= spy.move
@@ -92,7 +115,7 @@ while run:
         spy.walkCount = 0
 
     if not spy.jumping:
-        if buttom[pygame.K_SPACE]:
+        if buttom[pygame.K_UP]:
             spy.jumping = True
             spy.right = False
             spy.left = False
