@@ -26,19 +26,37 @@ class Player(object):
         self.left = False
         self.right = False
         self.walkCount = 0
+        self.standing = True
 
     def draw(self, window):
         if self.walkCount + 1 > 8:
             self.walkCount = 0
-
-        if spy.left:
-            window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
-            self.walkCount += 1
-        elif self.right:
-            window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
-            self.walkCount += 1
+        
+        if not(self.standing):
+          if self.left:
+              window.blit(walkLeft[self.walkCount // 2], (self.x, self.y))
+              self.walkCount += 1
+          elif self.right:
+              window.blit(walkRight[self.walkCount // 2], (self.x, self.y))
+              self.walkCount += 1
         else:
-            window.blit(stand, (self.x, self.y))
+          if self.right:
+            window.blit(walkRight[0], (self.x, self.y))
+          else:
+            window.blit(walkLeft[0], (self.x, self.y))
+
+            
+class Weapon(object):
+    def __init__(self, x, y, radius, color, direction):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.direction = direction
+        self.speed = 8 * direction
+
+    def draw(self, window):
+        pygame.draw.circle(window, self.color, (self.x, self.y), self.radius)        
 
 
 def update_game_window():
@@ -62,14 +80,15 @@ while run:
         spy.x -= spy.move
         spy.left = True
         spy.right = False
+        spy.standing = False
 
     elif buttom[pygame.K_RIGHT] and spy.x < 1150 - spy.move - spy.width:
         spy.x += spy.move
         spy.left = False
         spy.right = True
+        spy.standing = False
     else:
-        spy.right = False
-        spy.left = False
+        spy.standing = True
         spy.walkCount = 0
 
     if not spy.jumping:
