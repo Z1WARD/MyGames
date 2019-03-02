@@ -22,7 +22,7 @@ class Player(object):
         self.height = height
         self.move = 7
         self.jumping = False
-        self.jumpHeight = 10
+        self.jumpHeight = 8
         self.left = False
         self.right = False
         self.walkCount = 0
@@ -47,6 +47,50 @@ class Player(object):
                 window.blit(walkRight[0], (self.x, self.y))
 
 
+class Enemy(object):
+    walkRight = [pygame.image.load('RE1'), pygame.image.load('RE2'), pygame.image.load('RE3'),
+                 pygame.image.load('RE4'), pygame.image.load('RE5'), pygame.image.load('RE6')]
+    walkLeft = [pygame.image.load('LE1'), pygame.image.load('LE2'), pygame.image.load('LE3'),
+                 pygame.image.load('LE4'), pygame.image.load('LE5'), pygame.image.load('LE6')]
+
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.end = end
+        self.walkCount = 0
+        self.speed = 5
+        self.path = [self.x, self.end]
+
+    def draw(self, window):
+        self.move()
+        if self.walkCount + 1 >= 16:
+            self.walkCount = 0
+
+        if self.speed > 0:
+            window.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
+            self.walkCount += 1
+        else:
+            window.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
+            self.walkCount += 1
+        pass
+
+    def move(self):
+        if self.speed > 0:
+            if self.x + self.speed < self.path[1]:
+                self.x += self.speed
+            else:
+                self.speed = self.speed * -1
+                self.walkCount = 0
+        else:
+            if self.x - self.speed > self.path[0]:
+                self.x += self.speed
+            else:
+                self.speed = self.speed * -1
+                self.walkCount = 0
+
+
 class Weapon(object):
     def __init__(self, x, y, radius, color, direction):
         self.x = x
@@ -54,7 +98,7 @@ class Weapon(object):
         self.radius = radius
         self.color = color
         self.direction = direction
-        self.speed = 8 * direction
+        self.speed = 20 * direction
 
     def draw(self, window):
         pygame.draw.circle(window, self.color, (self.x, self.y), self.radius)
@@ -63,6 +107,7 @@ class Weapon(object):
 def update_game_window():
     window.blit(bg, (0, 0))
     spy.draw(window)
+    soldier.draw(window)
 
     for bullet in bullets:
         bullet.draw(window)
@@ -71,17 +116,18 @@ def update_game_window():
 
 
 spy = Player(300, 410, 64, 64)
+soldier = Enemy(100, 475, 64, 64, 1000)
 bullets = []
 run = True
 while run:
-    clock.tick(34)
+    clock.tick(40)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
-        if 15 < bullet.x < 1129:
+        if 15 < bullet.x < 1145:
             bullet.x += bullet.speed
         else:
             bullets.pop(bullets.index(bullet))
@@ -96,8 +142,8 @@ while run:
         else:
             direction = 1
 
-        if len(bullets) < 3:
-            bullets.append(Weapon(round(spy.x + spy.width), round(spy.y + spy.height // 0.73), 5, (0, 0, 0), direction))
+        if len(bullets) < 1:
+            bullets.append(Weapon(round(spy.x + spy.width), round(spy.y + spy.height // 0.73), 5, (0, 100, 200), direction))
 
     if buttom[pygame.K_LEFT] and spy.x > spy.move:
         spy.x -= spy.move
@@ -105,7 +151,7 @@ while run:
         spy.right = False
         spy.standing = False
 
-    elif buttom[pygame.K_RIGHT] and spy.x < 1150 - spy.move - spy.width:
+    elif buttom[pygame.K_RIGHT] and spy.x < 1140 - spy.move - spy.width:
         spy.x += spy.move
         spy.left = False
         spy.right = True
@@ -121,7 +167,7 @@ while run:
             spy.left = False
             spy.walkCount = 0
     else:
-        if spy.jumpHeight >= -10:
+        if spy.jumpHeight >= -8:
             neg = 1
             if spy.jumpHeight < 0:
                 neg = -1
@@ -129,7 +175,7 @@ while run:
             spy.jumpHeight -= 1
         else:
             spy.jumping = False
-            spy.jumpHeight = 10
+            spy.jumpHeight = 8
 
     update_game_window()
 
