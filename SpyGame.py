@@ -27,6 +27,7 @@ class Player(object):
         self.right = False
         self.walkCount = 0
         self.standing = True
+        self.hitbox = (self.x + 28, self.y, 35, 50)
 
     def draw(self, window):
         if self.walkCount + 1 > 8:
@@ -45,6 +46,8 @@ class Player(object):
                 window.blit(walkLeft[0], (self.x, self.y))
             else:
                 window.blit(walkRight[0], (self.x, self.y))
+        self.hitbox = (self.x + 17, self.y + 10, 78, 140)
+        pygame.draw.rect(window, (255, 0, 0), self.hitbox, 2)
 
 
 class Enemy(object):
@@ -62,6 +65,7 @@ class Enemy(object):
         self.walkCount = 0
         self.speed = 5
         self.path = [self.x, self.end]
+        self.hitbox = (self.x + 20, self.y, 28, 60)
 
     def draw(self, window):
         self.move()
@@ -74,7 +78,9 @@ class Enemy(object):
         else:
             window.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
             self.walkCount += 1
-        pass
+        self.hitbox = (self.x + 15, self.y + 12, 50, 85)
+        pygame.draw.rect(window, (255, 0, 0), self.hitbox, 2)
+
 
     def move(self):
         if self.speed > 0:
@@ -89,6 +95,9 @@ class Enemy(object):
             else:
                 self.speed = self.speed * -1
                 self.walkCount = 0
+
+    def hit(self):
+        print("HIT!")
 
 
 class Weapon(object):
@@ -127,6 +136,11 @@ while run:
             run = False
 
     for bullet in bullets:
+        if bullet.y - bullet.radius < soldier.hitbox[1] + soldier.hitbox[3] and bullet.y + bullet.radius > soldier.hitbox[1]:
+            if bullet.x + bullet.radius > soldier.hitbox[0] and bullet.x - bullet.radius < soldier.hitbox[0] + soldier.hitbox[2]:
+                soldier.hit()
+                bullets.pop(bullets.index(bullet))
+
         if 15 < bullet.x < 1145:
             bullet.x += bullet.speed
         else:
